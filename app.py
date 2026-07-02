@@ -1,5 +1,5 @@
 #app.py
-from flask import Flask, jsonify, render_template, request, redirect, url_for
+from flask import Flask, jsonify, request, redirect, url_for
 
 app = Flask(__name__)
 
@@ -60,7 +60,15 @@ def update_product(status):
     product_to_update.ingredients_text = data.get('ingredients_text', product_to_update.ingredients_text)
     return jsonify(product_to_update.to_dict())
 
-    return redirect(url_for('index'))
+#delete product from the inventory
+@app.route('/inventory/<int:status>', methods=['DELETE'])
+def delete_product(status):
+    product_to_delete = next((item for item in inventory if item.status == status), None)
+    if not product_to_delete:
+        return jsonify({'message': 'Product not found.'}), 404
+
+    inventory.remove(product_to_delete)
+    return jsonify({'message': 'Product deleted successfully.'})
 
 if __name__ == '__main__':
     app.run(debug=True)
