@@ -31,12 +31,8 @@ inventory = [
 #get all products in the inventory
 @app.route('/inventory/<int:status>', methods=['GET'])
 def get_inventory(status):
-    filtered_inventory = [item for item in inventory if item.status == status]
-    return (
-        jsonify([item.to_dict() for item in filtered_inventory]) 
-        if filtered_inventory 
-        else jsonify({'message': 'No products found for the given status.'})
-        ), 200
+    filtered_inventory = next((item for item in inventory if item.status == status), None)
+    return jsonify(filtered_inventory.to_dict()) if filtered_inventory else jsonify({'message': 'No products found for the given status.'}), 404
 
 #add new product to the inventory
 @app.route('/add', methods=['POST'])
