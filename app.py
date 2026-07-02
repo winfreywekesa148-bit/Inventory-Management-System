@@ -37,13 +37,15 @@ def get_inventory(status):
 #add new product to the inventory
 @app.route('/add', methods=['POST'])
 def add_product():
-    status = request.form['status']
-    product_name = request.form['product_name']
-    brands = request.form['brands']
-    ingredients_text = request.form['ingredients_text']
+    data = request.get_json()
+    new_status = max([item.status for item in inventory]) + 1 if inventory else 1
+    new_product_name = data['product_name']
+    new_brands = data['brands']
+    new_ingredients_text = data['ingredients_text']
 
-    new_product = Inventory(status, product_name, brands, ingredients_text)
+    new_product = Inventory(new_status, new_product_name, new_brands, new_ingredients_text)
     inventory.append(new_product)
+    return jsonify(new_product.to_dict()), 201
 
     return redirect(url_for('index'))
 
