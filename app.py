@@ -1,5 +1,5 @@
 #app.py
-from flask import Flask, render_template, request, redirect, url_for
+from flask import Flask, jsonify, render_template, request, redirect, url_for
 
 app = Flask(__name__)
 
@@ -28,9 +28,28 @@ inventory = [
     )
 ]
 
-@app.route('/')
-def index():
-    return render_template('index.html', inventory=inventory)
+#get all products in the inventory
+@app.route('/inventory/<int:status>', methods=['GET'])
+def get_inventory(status):
+    filtered_inventory = [item for item in inventory if item.status == status]
+    return (
+        jsonify([item.to_dict() for item in filtered_inventory]) 
+        if filtered_inventory 
+        else jsonify({'message': 'No products found for the given status.'})
+        ), 200
+
+#add new product to the inventory
+@app.route('/add', methods=['POST'])
+def add_product():
+    status = request.form['status']
+    product_name = request.form['product_name']
+    brands = request.form['brands']
+    ingredients_text = request.form['ingredients_text']
+
+    new_product = Inventory(status, product_name, brands, ingredients_text)
+    inventory.append(new_product)
+
+    return redirect(url_for('index'))
 
 if __name__ == '__main__':
     app.run(debug=True)
