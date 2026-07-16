@@ -59,25 +59,47 @@ def delete_product():
 
 #search items
 def search_inventory():
+    print("You are in search_inventory")
     product_name = input("Enter product name: ")
 
-    response = requests.get(f"http://127.0.0.1:5000/search/{product_name}")
+    url =  "https://world.openfoodfacts.org/cgi/search.pl"
 
-    if response.status_code == 200:
-
-        products = response.json()
-
-        print("\nProducts Found\n")
-
-        for product in products:
-            print("Product Name :", product["product_name"])
-            print("Brand        :", product["brands"])
-            print("Ingredients  :", product["ingredients"])
-
-    elif response.status_code == 404:
-        print("Product not found.")
-
+    params={
+            "search_terms": product_name,
+            "search_simple": 1,
+            "action": "process",
+            "json": 1
+        }
     
+    headers = {
+        "User-Agent":"InventoryManagementSystem/1.0 (student project)"
+    }
+    
+    response = requests.get(url, params=params, headers=headers)
+    print(response.status_code)
+
+    if response.status_code != 200:
+        return None
+    
+    data = response.json()
+
+    products = data.get("products", [])
+    print(products[0])
+
+    if not products:
+        return None
+    
+    results = []
+
+    for product in products:
+        results.append({
+        "product_name": data.get('product_name'),
+        "brands": data.get('brands'),
+        "ingredients_text": data.get('ingredients_text')
+        })
+
+    return results
+
 def display_menu():
     menu = """
 ===== Inventory Management System =====
