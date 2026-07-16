@@ -1,6 +1,5 @@
 #CLI Interface
 from urllib import response
-
 from inventory import inventory
 import requests
 
@@ -60,32 +59,25 @@ def delete_product():
 
 #search items
 def search_inventory():
-    product_name = input("Enter the product name to search: ")
+    product_name = input("Enter product name: ")
 
-    response = requests.get(
-        "https://world.openfoodfacts.org/cgi/search.pl",
-        params={
-            "search_terms": product_name,
-            "search_simple": 1,
-            "action": "process",
-            "json": 1
-        }
-    )
+    response = requests.get(f"http://127.0.0.1:5000/search/{product_name}")
+
+    if response.status_code == 200:
+
+        products = response.json()
+
+        print("\nProducts Found\n")
+
+        for product in products:
+            print("Product Name :", product["product_name"])
+            print("Brand        :", product["brands"])
+            print("Ingredients  :", product["ingredients"])
+
+    elif response.status_code == 404:
+        print("Product not found.")
+
     
-    result = response.json()
-
-    products = result.get('products', [])
-    if not products:
-        print("No products found.")
-        return
-    
-    print("Product found:")
-    for product in products:
-        print(f"Status: {product.get('status')},"
-              f"Product Name: {product.get('product_name')}, "
-              f"Brands: {product.get('brands')}, "
-              f"Ingredients: {product.get('ingredients_text')}")
-
 def display_menu():
     menu = """
 ===== Inventory Management System =====

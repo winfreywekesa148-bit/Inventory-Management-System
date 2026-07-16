@@ -37,12 +37,13 @@ def view_inventory(status):
 @app.route('/inventory', methods=['POST'])
 def add_product():
     data = request.get_json()
+    print(data)
     new_status = max([item['status'] for item in inventory]) + 1 if inventory else 1
     new_product = {
         "status": new_status,
-        "product_name": data['product_name'],
-        "brands": data['brands'],
-        "ingredients_text": data['ingredients_text']
+        "product_name": data.get('product_name'),
+        "brands": data.get('brands'),
+        "ingredients_text": data.get('ingredients_text')
     }
     inventory.append(new_product)
     return jsonify(new_product), 201
