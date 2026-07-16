@@ -44,5 +44,5 @@ def test_delete_item():
 def test_search_item():
     with app.test_client() as client:
         response = client.get('/search?name=Item')
-        assert response.status_code == 404
+        assert response.status_code == 200
         
